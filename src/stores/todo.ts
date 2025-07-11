@@ -29,7 +29,8 @@ export const useTodoStore = create(
         todos: [] as Todos,
         isLoadingForFetch: true,
         isLoadingForCreate: false,
-        isLoadingForUpdate: false
+        isLoadingForUpdate: false,
+        isLoadingForDelete: false
       },
       (set, get) => {
         return {
@@ -74,13 +75,16 @@ export const useTodoStore = create(
             })
           },
           deleteTodo: async (todo: Todo) => {
+            if (get().isLoadingForDelete) return
+            set({ isLoadingForDelete: true })
             await api({
               url: `/${todo.id}`,
               method: 'DELETE'
             })
             set(state => {
               const index = state.todos.findIndex(t => t.id === todo.id)
-              console.log(index)
+              state.todos.splice(index, 1)
+              state.isLoadingForDelete = false
             })
           }
         }
